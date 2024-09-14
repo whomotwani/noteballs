@@ -3,17 +3,18 @@ import { defineStore } from "pinia"
 export const useStoreNotes = defineStore('storeNotes', {
     state: () => {
         return {
-            notes: [
-                {
-                    id: '1',
-                    content: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nisi perferendis dicta aliquam accusantium earum? Tempora mollitia quidem molestiae quam commodi!'
-                },
-                {
-                    id: '2',
-                    content: 'A short note.'
-                }
-            ],
+            notes: [],
         }
+    },
+
+    getters: {
+        getNoteContent: (state) => {
+            return (id) => {
+                return state.notes.filter(i => i.id === id)[0]?.content
+            }
+        },
+        totalNotesCount: (state) => state.notes.length,
+        totalChractersCount: state => state.notes.reduce((prev, curr) => prev += curr.content.length, 0)
     },
 
     actions: {
@@ -28,6 +29,11 @@ export const useStoreNotes = defineStore('storeNotes', {
             if (index > -1) {
                 this.notes.splice(index, 1)
             }
+        },
+
+        updateNote(id, content) {
+            const index = this.notes.findIndex(note => note.id === id);
+            this.notes[index].content = content;
         }
     }
 })

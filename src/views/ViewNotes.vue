@@ -1,6 +1,6 @@
 <template>
     <div class="notes">
-        <AddOrEditNotes v-model="newNote" class="mb-5" ref="addOrEditNoteRef">
+        <AddOrEditNotes v-model="newNote" class="mb-5" ref="addOrEditNoteRef" placeholder="Add note...">
             <template #controls>
                 <button class="button is-link has-background-success" @click="addNote" :disabled="!newNote?.trim()">
                     Add New Note
@@ -13,9 +13,10 @@
 <script setup>
 import { ref } from 'vue';
 import Note from '@/components/notes/Note.vue';
+import { useStoreNotes } from '@/stores/storeNotes';
+import { useWatchChracters } from '@/use/useWatchChracters';
 import AddOrEditNotes from '@/components/notes/AddOrEditNotes.vue';
 
-import { useStoreNotes } from '@/stores/storeNotes';
 const { notes, addNote: addNoteAction } = useStoreNotes();
 
 const newNote = ref('');
@@ -29,4 +30,5 @@ function addNote() {
     }
 }
 
+useWatchChracters(newNote);
 </script>
