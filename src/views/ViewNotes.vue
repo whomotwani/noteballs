@@ -7,7 +7,13 @@
                 </button>
             </template>
         </AddOrEditNotes>
-        <Note v-for="note in notes" :key="note.id" :note="note" />
+        <progress v-if="notesLoading" class="progress is-small is-success" max="100" />
+        <template v-else>
+            <Note v-for="note in notes" :key="note.id" :note="note" />
+        </template>
+        <div v-if="!notes.length" class="is-size-4 has-text-centered has-text-grey-light py-6 is-family-monospace">
+            No Notes here yet...
+        </div>
     </div>
 </template>
 <script setup>
@@ -16,8 +22,11 @@ import Note from '@/components/notes/Note.vue';
 import { useStoreNotes } from '@/stores/storeNotes';
 import { useWatchChracters } from '@/use/useWatchChracters';
 import AddOrEditNotes from '@/components/notes/AddOrEditNotes.vue';
+import { storeToRefs } from 'pinia';
 
-const { notes, addNote: addNoteAction } = useStoreNotes();
+const store = useStoreNotes()
+const { notes } = storeToRefs(store);
+const { addNote: addNoteAction, loading: notesLoading } = store;
 
 const newNote = ref('');
 const addOrEditNoteRef = ref(null);
