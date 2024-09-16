@@ -38,29 +38,28 @@
 
 <script setup>
 import { computed, reactive, ref } from 'vue';
+import { useStoreAuth } from '@/stores/storeAuth';
+const { registerUser, loginUser } = useStoreAuth();
 
 const register = ref(false);
-
 const formTitle = computed(() => {
     return register.value == true ? 'Sign Up' : 'Sign In'
-})
-
+});
 const credentials = reactive({
     email: "",
     password: ""
-})
+});
 
 const onSubmit = () => {
     if (!credentials.email || !credentials.password) {
         alert("Please enter Email and Password")
     } else {
         if (register.value) {
-            console.log("Register user", credentials)
+            registerUser(credentials);
         } else {
-            console.log("Log user in", credentials)
+            loginUser(credentials)
         }
     }
-
 }
 </script>
 
