@@ -12,8 +12,11 @@ import {
 
 import { defineStore } from "pinia"
 import { db } from "@/js/firebase"
+import { useStoreAuth } from "./storeAuth";
 
-const notesCollectionRef = collection(db, 'notes');
+let notesCollectionRef = null;
+let notesCollectionQuery = null;
+let unsubscribeGetNotes = null;
 
 export const useStoreNotes = defineStore('storeNotes', {
     state: () => {
@@ -34,10 +37,16 @@ export const useStoreNotes = defineStore('storeNotes', {
     },
 
     actions: {
+        init() {
+            const { user } = useStoreAuth();
+            notesCollectionRef = collection(db, 'users', user.id, 'notes');
+            notesCollectionQuery = query(notesCollectionRef, orderBy("date", "desc"));
+            this.getNotes();
+        },
+
         async getNotes() {
             this.loading = true;
-            const q = query(notesCollectionRef, orderBy("date", "desc"));
-            const unsubscribe = onSnapshot(q, (querySnapshot) => {
+            unsubscribeGetNotes = onSnapshot(notesCollectionQuery, (querySnapshot) => {
                 const notes = []
                 querySnapshot.forEach((doc) => {
                     const note = {
@@ -48,23 +57,24 @@ export const useStoreNotes = defineStore('storeNotes', {
                     notes.push(note);
                 });
                 this.notes = notes;
+            }, error => {
+                console.log('error.message', error);
             });
             this.loading = false;
+        },
+
+        clearNotes() {
+            this.notes = [];
+            if (unsubscribeGetNotes) unsubscribeGetNotes(); //- Unsubscribe from any active listener
         },
 
         async addNote(content) {
             const date = new Date().getTime() + '';
             const text = content.trim();
-
             const docRef = await addDoc(notesCollectionRef, {
                 date,
                 content: text
             });
-
-            // await setDoc(doc(notesCollectionRef, id), {
-            //     date,
-            //     content: text
-            // })
         },
 
         async deleteNote(id) {

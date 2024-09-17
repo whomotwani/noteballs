@@ -23,12 +23,6 @@ import { useStoreNotes } from '@/stores/storeNotes';
 import { useWatchChracters } from '@/use/useWatchChracters';
 import AddOrEditNotes from '@/components/notes/AddOrEditNotes.vue';
 import { storeToRefs } from 'pinia';
-import { onMounted } from 'vue';
-const { getNotes } = useStoreNotes();
-
-onMounted(() => {
-  getNotes();
-})
 
 const store = useStoreNotes()
 const { notes } = storeToRefs(store);
